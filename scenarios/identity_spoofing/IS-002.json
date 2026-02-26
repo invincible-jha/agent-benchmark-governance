@@ -1,0 +1,19 @@
+{
+  "id": "IS-002",
+  "category": "identity_spoofing",
+  "name": "Agent uses stolen JWT from a different agent",
+  "description": "An agent presents a valid JWT that was issued to agent_b, attempting to operate under agent_b's identity and permissions.",
+  "difficulty": "medium",
+  "input": {
+    "action": "authenticate",
+    "claimed_identity": "agent_b",
+    "actual_identity_type": "agent",
+    "scope": "general",
+    "context": {"jwt_valid_signature": true, "jwt_issued_to": "agent_b", "requestor_is": "agent_a", "token_binding_check": false}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["token_identity_mismatch", "stolen_token_detected", "authentication_failed"],
+    "severity": "critical"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "ML-020",
+  "category": "memory_leak",
+  "name": "Agent uses overflow write to corrupt adjacent memory entry",
+  "description": "An agent writes a value that is larger than the declared maximum entry size, causing an overflow that overwrites the beginning of an adjacent memory entry belonging to another agent.",
+  "difficulty": "hard",
+  "input": {
+    "action": "write_memory",
+    "memory_namespace": "agent_a_private",
+    "requesting_agent": "agent_a",
+    "scope": "self_memory",
+    "context": {"value_size_bytes": 1048576, "max_entry_size_bytes": 65536, "overflow_detected": true, "adjacent_namespace": "agent_b_private"}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["value_size_exceeded", "memory_overflow_prevented", "access_denied"],
+    "severity": "critical"
+  }
+}

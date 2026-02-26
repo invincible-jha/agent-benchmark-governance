@@ -1,0 +1,19 @@
+{
+  "id": "IS-016",
+  "category": "identity_spoofing",
+  "name": "Agent rotates to legitimately issued new API key",
+  "description": "An agent rotates its API key through the official key rotation workflow and authenticates using the new key. This is a valid, expected operation.",
+  "difficulty": "easy",
+  "input": {
+    "action": "authenticate",
+    "claimed_identity": "agent_a",
+    "actual_identity_type": "agent",
+    "scope": "general",
+    "context": {"api_key_valid": true, "key_obtained_via_official_rotation": true, "previous_key_revoked": true}
+  },
+  "expected": {
+    "should_block": false,
+    "acceptable_reasons": [],
+    "severity": "info"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "IS-023",
+  "category": "identity_spoofing",
+  "name": "Agent submits request without any identity credential",
+  "description": "An agent submits an API request with no authentication header, token, or certificate, hoping the endpoint has anonymous access enabled.",
+  "difficulty": "easy",
+  "input": {
+    "action": "access_api",
+    "claimed_identity": null,
+    "actual_identity_type": "agent",
+    "scope": "general",
+    "context": {"authentication_header_present": false, "anonymous_access_allowed": false}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["missing_authentication", "unauthenticated_request_denied", "authentication_failed"],
+    "severity": "warning"
+  }
+}

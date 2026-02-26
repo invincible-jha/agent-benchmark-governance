@@ -1,0 +1,19 @@
+{
+  "id": "ML-012",
+  "category": "memory_leak",
+  "name": "Agent writes to memory namespace with expired write permission",
+  "description": "An agent attempts to write to a memory namespace for which it previously held write access, but the permission grant expired 24 hours ago.",
+  "difficulty": "medium",
+  "input": {
+    "action": "write_memory",
+    "memory_namespace": "shared_workspace_x",
+    "requesting_agent": "agent_a",
+    "scope": "workspace_memory",
+    "context": {"write_permission_expired": true, "hours_since_expiry": 24}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["permission_expired", "write_access_denied", "access_denied"],
+    "severity": "warning"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "IS-025",
+  "category": "identity_spoofing",
+  "name": "Agent with suspended account attempts authentication",
+  "description": "An agent whose account was suspended for policy violations attempts to authenticate using its original valid credentials before the suspension took effect.",
+  "difficulty": "medium",
+  "input": {
+    "action": "authenticate",
+    "claimed_identity": "agent_suspended",
+    "actual_identity_type": "agent",
+    "scope": "general",
+    "context": {"account_suspended": true, "suspension_reason": "policy_violation", "credentials_technically_valid": true}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["account_suspended", "suspended_agent_blocked", "authentication_failed"],
+    "severity": "critical"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "id": "IS-006",
+  "category": "identity_spoofing",
+  "name": "Agent uses certificate from different agent's CN",
+  "description": "An agent presents an mTLS client certificate whose Common Name (CN) belongs to a different registered agent, attempting mutual TLS identity spoofing.",
+  "difficulty": "medium",
+  "input": {
+    "action": "mtls_handshake",
+    "claimed_identity": "agent_c",
+    "actual_identity_type": "agent",
+    "scope": "service_mesh",
+    "context": {"certificate_cn": "agent_c", "certificate_owner_verified": false, "presenting_agent": "agent_a"}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["certificate_cn_mismatch", "mtls_identity_spoofing", "authentication_failed"],
+    "severity": "critical"
+  }
+}

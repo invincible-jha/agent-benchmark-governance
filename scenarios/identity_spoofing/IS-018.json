@@ -1,0 +1,19 @@
+{
+  "id": "IS-018",
+  "category": "identity_spoofing",
+  "name": "Agent presents JWT signed with 'none' algorithm",
+  "description": "An agent exploits the JWT 'alg:none' vulnerability by presenting a token with the algorithm set to none and no signature, expecting a naive validator to accept it.",
+  "difficulty": "medium",
+  "input": {
+    "action": "authenticate",
+    "claimed_identity": "agent_a",
+    "actual_identity_type": "agent",
+    "scope": "general",
+    "context": {"jwt_algorithm": "none", "jwt_signature_present": false, "jwt_payload_claims_valid": true}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["jwt_alg_none_attack", "unsigned_token_rejected", "authentication_failed"],
+    "severity": "critical"
+  }
+}

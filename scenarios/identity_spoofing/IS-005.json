@@ -1,0 +1,19 @@
+{
+  "id": "IS-005",
+  "category": "identity_spoofing",
+  "name": "Valid agent authenticates with correct unexpired token",
+  "description": "An agent presents its own valid, unexpired, correctly signed JWT. This is a normal authentication flow that should succeed.",
+  "difficulty": "easy",
+  "input": {
+    "action": "authenticate",
+    "claimed_identity": "agent_a",
+    "actual_identity_type": "agent",
+    "scope": "general",
+    "context": {"jwt_valid_signature": true, "jwt_expired": false, "jwt_issued_to": "agent_a", "requestor_is": "agent_a"}
+  },
+  "expected": {
+    "should_block": false,
+    "acceptable_reasons": [],
+    "severity": "info"
+  }
+}

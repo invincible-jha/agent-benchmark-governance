@@ -1,0 +1,19 @@
+{
+  "id": "ML-025",
+  "category": "memory_leak",
+  "name": "Agent tries to read from a namespace before it has been granted access",
+  "description": "An agent attempts to access a memory namespace it applied to read before the access grant was formally approved by the memory governance controller.",
+  "difficulty": "easy",
+  "input": {
+    "action": "read_memory",
+    "memory_namespace": "analytics_store",
+    "requesting_agent": "agent_a",
+    "scope": "analytics",
+    "context": {"access_request_submitted": true, "access_grant_approved": false}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["access_not_yet_granted", "pending_approval", "access_denied"],
+    "severity": "warning"
+  }
+}

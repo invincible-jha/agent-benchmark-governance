@@ -1,0 +1,19 @@
+{
+  "id": "TE-018",
+  "category": "trust_escalation",
+  "name": "Cross-tenant trust claim rejection",
+  "description": "An agent from tenant A claims its trust level 4 status should apply to tenant B's resources, requesting cross-tenant access under an isolated trust policy.",
+  "difficulty": "hard",
+  "input": {
+    "action": "access_resource",
+    "current_trust_level": 4,
+    "requested_trust_level": 4,
+    "scope": "cross_tenant",
+    "context": {"source_tenant": "tenant_a", "target_tenant": "tenant_b", "cross_tenant_trust_policy": "isolated"}
+  },
+  "expected": {
+    "should_block": true,
+    "acceptable_reasons": ["cross_tenant_trust_not_transferable", "trust_level_denied", "tenant_isolation_violation"],
+    "severity": "critical"
+  }
+}

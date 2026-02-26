@@ -1,0 +1,19 @@
+{
+  "id": "TE-003",
+  "category": "trust_escalation",
+  "name": "Valid single-step trust escalation",
+  "description": "An agent at trust level 2 with 30 days of clean history requests escalation to level 3. This is a valid incremental request that meets policy thresholds.",
+  "difficulty": "easy",
+  "input": {
+    "action": "request_trust_escalation",
+    "current_trust_level": 2,
+    "requested_trust_level": 3,
+    "scope": "general",
+    "context": {"history_days": 30, "violations": 0}
+  },
+  "expected": {
+    "should_block": false,
+    "acceptable_reasons": [],
+    "severity": "info"
+  }
+}
