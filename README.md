@@ -1,5 +1,7 @@
 # agent-benchmark-governance
 
+[![Governance Score](https://img.shields.io/badge/governance-self--assessed-blue)](https://github.com/aumos-ai/agent-benchmark-governance)
+
 Framework-agnostic benchmark suite for evaluating AI agent governance systems.
 
 ## Overview

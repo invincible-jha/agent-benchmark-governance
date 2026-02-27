@@ -1,0 +1,314 @@
+<!--
+  SPDX-License-Identifier: Apache-2.0
+  Copyright (c) 2026 MuVeraAI Corporation
+
+  AumOS Agent Governance Benchmark — Public Leaderboard
+  Vanilla HTML/JS, no build step required. Fetches data.json at runtime.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AumOS Agent Governance Benchmark — public leaderboard tracking governance system scores across 8 attack categories." />
+  <title>AumOS Governance Benchmark Leaderboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ---- Header ---- -->
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="site-header__brand" href="https://github.com/aumos-ai/agent-benchmark-governance">
+        <span class="site-header__logo">AumOS</span>
+        <span class="site-header__subtitle">Agent Governance Benchmark</span>
+      </a>
+      <ul class="site-header__links">
+        <li><a href="https://github.com/aumos-ai/agent-benchmark-governance" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://docs.aumos.ai/benchmark" target="_blank" rel="noopener">Docs</a></li>
+        <li><a href="https://github.com/aumos-ai/agent-benchmark-governance/blob/main/docs/adapter-guide.md" target="_blank" rel="noopener">Submit</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- ---- Main ---- -->
+  <main class="main">
+
+    <!-- Summary stats -->
+    <div class="summary-bar" id="summary-bar">
+      <div class="stat-card">
+        <div class="stat-card__label">Implementations</div>
+        <div class="stat-card__value" id="stat-implementations">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Categories</div>
+        <div class="stat-card__value" id="stat-categories">8</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Top Score</div>
+        <div class="stat-card__value" id="stat-top-score">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card__label">Last Updated</div>
+        <div class="stat-card__value" id="stat-last-updated" style="font-size:1rem;padding-top:0.25rem">—</div>
+      </div>
+    </div>
+
+    <!-- Leaderboard table -->
+    <h2 class="section-title">Rankings</h2>
+
+    <div class="toolbar">
+      <span class="toolbar__label">Sort by column header. Scores are pass-rate percentages (0–100).</span>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="leaderboard-table" aria-label="Governance benchmark leaderboard">
+        <thead id="table-head"></thead>
+        <tbody id="table-body">
+          <tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--text-secondary)">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  <!-- ---- Footer ---- -->
+  <footer class="site-footer">
+    <p>
+      Apache 2.0 &mdash; Copyright &copy; 2026 MuVeraAI Corporation &mdash;
+      <a href="https://github.com/aumos-ai/agent-benchmark-governance" target="_blank" rel="noopener">github.com/aumos-ai/agent-benchmark-governance</a>
+    </p>
+    <p style="margin-top:0.4rem">
+      Scores are self-reported or CI-generated. See
+      <a href="https://github.com/aumos-ai/agent-benchmark-governance/blob/main/docs/adapter-guide.md" target="_blank" rel="noopener">adapter guide</a>
+      to submit your implementation.
+    </p>
+  </footer>
+
+  <script>
+    "use strict";
+
+    // ----------------------------------------------------------------
+    // Constants
+    // ----------------------------------------------------------------
+
+    const CATEGORY_LABELS = {
+      trust_escalation:    "Trust Esc.",
+      budget_abuse:        "Budget",
+      memory_leak:         "Memory",
+      consent_violation:   "Consent",
+      identity_spoofing:   "Identity",
+      cross_domain_leakage:"X-Domain",
+      social_engineering:  "Social Eng.",
+      privilege_escalation:"Priv. Esc.",
+    };
+
+    const RANK_CLASSES = ["gold", "silver", "bronze"];
+
+    // ----------------------------------------------------------------
+    // Score chip helper
+    // ----------------------------------------------------------------
+
+    function scoreChip(value) {
+      if (value === null || value === undefined) {
+        return '<span class="score-chip score-chip--low">N/A</span>';
+      }
+      const num = Number(value);
+      let cls;
+      if (num > 80) {
+        cls = "score-chip--high";
+      } else if (num >= 60) {
+        cls = "score-chip--mid";
+      } else {
+        cls = "score-chip--low";
+      }
+      return `<span class="score-chip ${cls}">${num}</span>`;
+    }
+
+    // ----------------------------------------------------------------
+    // Table rendering
+    // ----------------------------------------------------------------
+
+    let currentData = [];
+    let sortKey = "total_score";
+    let sortAsc = false;       // default: highest first
+
+    function buildColumns(categories) {
+      return [
+        { key: "rank",        label: "Rank",   sortable: false },
+        { key: "name",        label: "Implementation", sortable: true },
+        { key: "language",    label: "Lang",   sortable: true },
+        { key: "total_score", label: "Total",  sortable: true },
+        ...categories.map((cat) => ({
+          key: `scores.${cat}`,
+          label: CATEGORY_LABELS[cat] || cat,
+          sortable: true,
+        })),
+        { key: "last_updated", label: "Updated", sortable: true },
+      ];
+    }
+
+    function getNestedValue(obj, key) {
+      if (key.startsWith("scores.")) {
+        const cat = key.slice("scores.".length);
+        return obj.scores?.[cat] ?? null;
+      }
+      return obj[key] ?? null;
+    }
+
+    function renderHead(columns) {
+      const head = document.getElementById("table-head");
+      const tr = document.createElement("tr");
+      columns.forEach((col) => {
+        const th = document.createElement("th");
+        th.textContent = col.label;
+        if (col.sortable) {
+          th.classList.add("sortable");
+          const span = document.createElement("span");
+          span.className = "sort-indicator";
+          span.setAttribute("aria-hidden", "true");
+          if (col.key === sortKey) {
+            th.classList.add(sortAsc ? "sort-asc" : "sort-desc");
+            span.textContent = sortAsc ? " ▲" : " ▼";
+          } else {
+            span.textContent = " ⇅";
+          }
+          th.appendChild(span);
+          th.addEventListener("click", () => onSort(col.key, columns));
+        }
+        tr.appendChild(th);
+      });
+      head.innerHTML = "";
+      head.appendChild(tr);
+    }
+
+    function renderBody(entries, columns) {
+      const tbody = document.getElementById("table-body");
+      tbody.innerHTML = "";
+      entries.forEach((entry, index) => {
+        const tr = document.createElement("tr");
+        columns.forEach((col) => {
+          const td = document.createElement("td");
+          if (col.key === "rank") {
+            const rank = index + 1;
+            const rankClass = rank <= 3 ? `rank-badge--${RANK_CLASSES[rank - 1]}` : "";
+            td.innerHTML = `<span class="rank-badge ${rankClass}">${rank}</span>`;
+          } else if (col.key === "name") {
+            td.innerHTML = `<div class="impl-name">${escapeHtml(entry.name)}</div>
+                            <div class="impl-vendor">${escapeHtml(entry.vendor)}</div>`;
+          } else if (col.key === "language") {
+            td.innerHTML = `<span class="lang-tag">${escapeHtml(entry.language)}</span>`;
+          } else if (col.key === "total_score" || col.key.startsWith("scores.")) {
+            const val = getNestedValue(entry, col.key);
+            td.innerHTML = scoreChip(val);
+          } else if (col.key === "last_updated") {
+            td.textContent = entry.last_updated ?? "—";
+            td.style.color = "var(--text-secondary)";
+            td.style.fontSize = "0.8rem";
+          } else {
+            td.textContent = getNestedValue(entry, col.key) ?? "—";
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ----------------------------------------------------------------
+    // Sorting
+    // ----------------------------------------------------------------
+
+    function onSort(key, columns) {
+      if (sortKey === key) {
+        sortAsc = !sortAsc;
+      } else {
+        sortKey = key;
+        // For scores, default to descending (highest first).
+        // For names/dates, default to ascending.
+        sortAsc = (key === "name" || key === "language" || key === "last_updated");
+      }
+      const sorted = sortEntries(currentData);
+      renderHead(columns);
+      renderBody(sorted, columns);
+    }
+
+    function sortEntries(entries) {
+      return [...entries].sort((a, b) => {
+        const av = getNestedValue(a, sortKey);
+        const bv = getNestedValue(b, sortKey);
+        if (av === null && bv === null) return 0;
+        if (av === null) return 1;
+        if (bv === null) return -1;
+        let comparison = 0;
+        if (typeof av === "number" && typeof bv === "number") {
+          comparison = av - bv;
+        } else {
+          comparison = String(av).localeCompare(String(bv));
+        }
+        return sortAsc ? comparison : -comparison;
+      });
+    }
+
+    // ----------------------------------------------------------------
+    // Summary stats
+    // ----------------------------------------------------------------
+
+    function updateSummaryStats(data) {
+      document.getElementById("stat-implementations").textContent = data.entries.length;
+      const topScore = Math.max(...data.entries.map((e) => e.total_score ?? 0));
+      document.getElementById("stat-top-score").textContent = topScore;
+      document.getElementById("stat-last-updated").textContent = data.last_updated ?? "—";
+    }
+
+    // ----------------------------------------------------------------
+    // XSS safety
+    // ----------------------------------------------------------------
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    // ----------------------------------------------------------------
+    // Data loading
+    // ----------------------------------------------------------------
+
+    async function loadAndRender() {
+      let data;
+      try {
+        const response = await fetch("data.json");
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        data = await response.json();
+      } catch (err) {
+        document.getElementById("table-body").innerHTML =
+          `<tr><td colspan="12" style="text-align:center;padding:2rem;color:var(--accent-red)">
+            Failed to load leaderboard data: ${escapeHtml(String(err))}
+           </td></tr>`;
+        return;
+      }
+
+      currentData = data.entries ?? [];
+      const categories = data.categories ?? [];
+      const columns = buildColumns(categories);
+
+      updateSummaryStats(data);
+
+      const sorted = sortEntries(currentData);
+      renderHead(columns);
+      renderBody(sorted, columns);
+    }
+
+    // ----------------------------------------------------------------
+    // Bootstrap
+    // ----------------------------------------------------------------
+
+    document.addEventListener("DOMContentLoaded", loadAndRender);
+  </script>
+</body>
+</html>

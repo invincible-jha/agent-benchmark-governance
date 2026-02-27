@@ -1,0 +1,351 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright (c) 2026 MuVeraAI Corporation */
+
+/* ============================================================
+   AumOS Agent Governance Benchmark — Leaderboard Styles
+   Dark theme, professional benchmark dashboard aesthetic
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary:    #0d1117;
+  --bg-secondary:  #161b22;
+  --bg-card:       #1c2128;
+  --bg-hover:      #21262d;
+  --border:        #30363d;
+  --border-muted:  #21262d;
+
+  --text-primary:  #e6edf3;
+  --text-secondary: #8b949e;
+  --text-muted:    #484f58;
+
+  --accent-blue:   #58a6ff;
+  --accent-green:  #3fb950;
+  --accent-yellow: #d29922;
+  --accent-red:    #f85149;
+
+  --score-high-bg:    rgba(63, 185, 80, 0.15);
+  --score-high-text:  #3fb950;
+  --score-mid-bg:     rgba(210, 153, 34, 0.15);
+  --score-mid-text:   #d29922;
+  --score-low-bg:     rgba(248, 81, 73, 0.15);
+  --score-low-text:   #f85149;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 6px;
+}
+
+html {
+  font-size: 14px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ---- Header ---- */
+
+.site-header {
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 56px;
+}
+
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.site-header__logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--accent-blue);
+}
+
+.site-header__subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.site-header__links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.site-header__links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: color 0.15s ease;
+}
+
+.site-header__links a:hover {
+  color: var(--text-primary);
+}
+
+/* ---- Main layout ---- */
+
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* ---- Hero / summary stats ---- */
+
+.summary-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.stat-card__label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.4rem;
+}
+
+.stat-card__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- Section headers ---- */
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-muted);
+}
+
+/* ---- Controls toolbar ---- */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.toolbar__label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* ---- Leaderboard table ---- */
+
+.table-wrapper {
+  overflow-x: auto;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+thead th {
+  background-color: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+thead th.sortable {
+  cursor: pointer;
+}
+
+thead th.sortable:hover {
+  color: var(--text-primary);
+}
+
+thead th .sort-indicator {
+  display: inline-block;
+  margin-left: 4px;
+  opacity: 0.4;
+  font-size: 0.65rem;
+}
+
+thead th.sort-asc .sort-indicator,
+thead th.sort-desc .sort-indicator {
+  opacity: 1;
+  color: var(--accent-blue);
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border-muted);
+  transition: background-color 0.1s ease;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+tbody td {
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.rank-badge--gold   { border-color: #ffd700; color: #ffd700; }
+.rank-badge--silver { border-color: #c0c0c0; color: #c0c0c0; }
+.rank-badge--bronze { border-color: #cd7f32; color: #cd7f32; }
+
+.impl-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.impl-vendor {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.lang-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 2em;
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* ---- Score chips ---- */
+
+.score-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  min-width: 46px;
+}
+
+.score-chip--high {
+  background-color: var(--score-high-bg);
+  color: var(--score-high-text);
+}
+
+.score-chip--mid {
+  background-color: var(--score-mid-bg);
+  color: var(--score-mid-text);
+}
+
+.score-chip--low {
+  background-color: var(--score-low-bg);
+  color: var(--score-low-text);
+}
+
+/* ---- Footer ---- */
+
+.site-footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  border-top: 1px solid var(--border-muted);
+  margin-top: 3rem;
+}
+
+.site-footer a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--accent-blue);
+}
+
+/* ---- Responsive ---- */
+
+@media (max-width: 768px) {
+  .main {
+    padding: 1rem;
+  }
+
+  .site-header {
+    padding: 0 1rem;
+  }
+
+  .site-header__links {
+    display: none;
+  }
+
+  .summary-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
