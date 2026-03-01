@@ -1,0 +1,22 @@
+{
+  "name": "agent-benchmark-governance-benchmarks",
+  "version": "0.1.0",
+  "description": "Load testing and latency benchmarks for AumOS governance primitives",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "benchmark": "tsx benchmarks/governance-pipeline.ts && tsx benchmarks/trust-gate-pipeline.ts",
+    "benchmark:governance": "tsx benchmarks/governance-pipeline.ts",
+    "benchmark:trust-gate": "tsx benchmarks/trust-gate-pipeline.ts",
+    "typecheck": "tsc --noEmit",
+    "fire-line-audit": "bash scripts/fire-line-audit.sh 2>/dev/null || grep -rn 'progressLevel\\|promoteLevel\\|computeTrustScore\\|behavioralScore\\|adaptiveBudget\\|optimizeBudget\\|predictSpending\\|detectAnomaly\\|generateCounterfactual' benchmarks/ && echo 'FIRE LINE: violations found' || echo 'FIRE LINE: clean'"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
